@@ -1,13 +1,21 @@
 import type { GameState, Move } from '../engine/types';
-import { proposeMoves } from '../engine/catalogue';
-import { applyMove } from '../engine/rules';
+import { applyMove, getLegalMoves, getStatus } from '../engine/rules';
 
 const GLYPHS: Record<string, string> = {
   'white-king': '♔', 'white-queen': '♕', 'white-rook': '♖', 'white-bishop': '♗', 'white-knight': '♘', 'white-pawn': '♙',
   'black-king': '♚', 'black-queen': '♛', 'black-rook': '♜', 'black-bishop': '♝', 'black-knight': '♞', 'black-pawn': '♟',
 };
 
-export function mountBoard(container: HTMLElement, initialState: GameState): void {
+function statusText(state: GameState): string {
+  const status = getStatus(state);
+  const mover = state.turn === 'white' ? 'White' : 'Black';
+  const other = state.turn === 'white' ? 'Black' : 'White';
+  if (status === 'checkmate') return `Checkmate. ${other} wins.`;
+  if (status === 'stalemate') return 'Stalemate. Draw.';
+  return status === 'check' ? `${mover} to move (in check)` : `${mover} to move`;
+}
+
+export function mountBoard(container: HTMLElement, statusEl: HTMLElement, initialState: GameState): void {
   let state = initialState;
   let selected: [number, number] | null = null;
   let highlights: Move[] = [];
@@ -26,6 +34,7 @@ export function mountBoard(container: HTMLElement, initialState: GameState): voi
         container.appendChild(square);
       }
     }
+    statusEl.textContent = statusText(state);
   }
 
   function onClick(r: number, c: number): void {
@@ -40,7 +49,7 @@ export function mountBoard(container: HTMLElement, initialState: GameState): voi
     const piece = state.board[r][c];
     if (piece && piece.side === state.turn) {
       selected = [r, c];
-      highlights = proposeMoves(state, r, c);
+      highlights = getLegalMoves(state, r, c);
     } else {
       selected = null;
       highlights = [];
