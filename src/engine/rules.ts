@@ -13,6 +13,10 @@ export function applyMove(state: GameState, move: Move): GameState {
   piece.hasMoved = true;
   next.board[tr][tc] = piece;   // lands on the target, replacing any captured piece
   next.board[fr][fc] = null;
+    // Promotion: a pawn reaching the far row becomes a queen
+  if (piece.type === 'pawn' && ((piece.side === 'white' && tr === 0) || (piece.side === 'black' && tr === 7))) {
+    piece.type = 'queen';
+  }
   next.turn = next.turn === 'white' ? 'black' : 'white';
   next.turnCount += 1;
   return next;

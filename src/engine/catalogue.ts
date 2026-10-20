@@ -1,6 +1,6 @@
 import type { GameState, Move, Offset } from './types';
 import { jump, slide } from './moves';
-
+import { pawnMoves } from './pawn';
 export type PieceDef = {
   baseMoves: (state: GameState, r: number, c: number) => Move[];
   condition?: (state: GameState, r: number, c: number) => boolean;
@@ -18,6 +18,7 @@ export const CATALOGUE: Record<string, PieceDef> = {
   bishop: { baseMoves: (s, r, c) => slide(s, r, c, DIAGONAL_DIRS, 8) },
   queen: { baseMoves: (s, r, c) => slide(s, r, c, ALL_DIRS, 8) },
   king: { baseMoves: (s, r, c) => slide(s, r, c, ALL_DIRS, 1) },
+  pawn: { baseMoves: pawnMoves },
 };
 
 export function proposeMoves(state: GameState, r: number, c: number): Move[] {
