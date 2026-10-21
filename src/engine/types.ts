@@ -12,6 +12,7 @@ export type Move = {
   from: Square;
   to: Square;
   mode: 'move' | 'capture' | 'both';
+  castle?: { rookFrom: Square; rookTo: Square };   // set only on castling moves
 };
 
 export type Effect = { kind: string; square?: Square; turnsLeft: number };
