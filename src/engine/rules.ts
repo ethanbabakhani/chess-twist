@@ -1,6 +1,6 @@
 import type { GameState, Move, Side, Square } from './types';
 import { cloneState } from './state';
-import { proposeMoves } from './catalogue';
+import { proposeMoves, familyOf } from './catalogue';
 
 export type Status = 'playing' | 'check' | 'checkmate' | 'stalemate';
 
@@ -13,8 +13,8 @@ export function applyMove(state: GameState, move: Move): GameState {
   piece.hasMoved = true;
   next.board[tr][tc] = piece;   // lands on the target, replacing any captured piece
   next.board[fr][fc] = null;
-    // Promotion: a pawn reaching the far row becomes a queen
-  if (piece.type === 'pawn' && ((piece.side === 'white' && tr === 0) || (piece.side === 'black' && tr === 7))) {
+  // Promotion: a pawn-like piece reaching the far row becomes a queen
+  if (familyOf(piece) === 'pawn' && ((piece.side === 'white' && tr === 0) || (piece.side === 'black' && tr === 7))) {
     piece.type = 'queen';
   }
   next.turn = next.turn === 'white' ? 'black' : 'white';
@@ -26,7 +26,7 @@ export function findKing(state: GameState, side: Side): Square | null {
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
       const p = state.board[r][c];
-      if (p && p.type === 'king' && p.side === side) return [r, c];
+      if (p && p.side === side && familyOf(p) === 'king') return [r, c];
     }
   }
   return null;
