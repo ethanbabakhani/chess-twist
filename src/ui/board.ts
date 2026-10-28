@@ -1,4 +1,5 @@
 import type { GameState, Move } from '../engine/types';
+import { CATALOGUE } from '../engine/catalogue';
 import { applyMove, getLegalMoves, getStatus } from '../engine/rules';
 
 const GLYPHS: Record<string, string> = {
@@ -29,7 +30,16 @@ export function mountBoard(container: HTMLElement, statusEl: HTMLElement, initia
         if (selected && selected[0] === r && selected[1] === c) square.classList.add('selected');
         if (highlights.some(m => m.to[0] === r && m.to[1] === c)) square.classList.add('target');
         const piece = state.board[r][c];
-        if (piece) square.textContent = GLYPHS[`${piece.side}-${piece.type}`] ?? '?';
+        if (piece) {
+          const symbol = GLYPHS[`${piece.side}-${piece.type}`];
+          if (symbol) {
+            square.textContent = symbol;
+          } else {
+            // custom pieces get a short text label until they have real artwork
+            square.textContent = CATALOGUE[piece.type]?.icon ?? '?';
+            square.classList.add('custom', piece.side);
+          }
+        }
         square.addEventListener('click', () => onClick(r, c));
         container.appendChild(square);
       }

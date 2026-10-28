@@ -1,5 +1,5 @@
-import type { GameState, Move } from './types';
-import { inBounds } from './moves';
+import type { GameState, Move, Offset } from './types';
+import { inBounds, slide } from './moves';
 
 export function pawnMoves(state: GameState, r: number, c: number): Move[] {
   const pawn = state.board[r][c];
@@ -30,4 +30,12 @@ export function pawnMoves(state: GameState, r: number, c: number): Move[] {
     }
   }
   return moves;
+}
+
+// Bully: moves and captures straight ahead only. Up to 3 squares on its first move, then 1.
+export function bullyMoves(state: GameState, r: number, c: number): Move[] {
+  const bully = state.board[r][c];
+  if (!bully) return [];
+  const forward: Offset = bully.side === 'white' ? [-1, 0] : [1, 0];
+  return slide(state, r, c, [forward], bully.hasMoved ? 1 : 3);
 }

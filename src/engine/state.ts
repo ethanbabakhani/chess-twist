@@ -20,3 +20,21 @@ export function createInitialState(): GameState {
   }
   return { board, turn: 'white', turnCount: 0, effects: [] };
 }
+
+// Testing setup (open the site with ?sandbox): drops the custom pieces into the standard layout
+export function createSandboxState(): GameState {
+  const state = createInitialState();
+  for (const side of ['white', 'black'] as const) {
+    const back = side === 'white' ? 7 : 0;
+    const pawnRow = side === 'white' ? 6 : 1;
+    state.board[back][0] = makePiece('archer', side);
+    state.board[back][2] = makePiece('wizard', side);
+    state.board[back][4] = makePiece('warden', side);
+    state.board[back][5] = makePiece('jester', side);
+    state.board[pawnRow][0] = makePiece('soldier', side);
+    state.board[pawnRow][3] = makePiece('bully', side);
+    state.board[pawnRow][4] = makePiece('bully', side);
+    state.board[pawnRow][7] = makePiece('soldier', side);
+  }
+  return state;
+}
