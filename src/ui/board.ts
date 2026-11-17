@@ -1,11 +1,6 @@
 import type { GameState, Move } from '../engine/types';
-import { CATALOGUE } from '../engine/catalogue';
 import { applyMove, getLegalMoves, getStatus } from '../engine/rules';
-
-const GLYPHS: Record<string, string> = {
-  'white-king': '♔', 'white-queen': '♕', 'white-rook': '♖', 'white-bishop': '♗', 'white-knight': '♘', 'white-pawn': '♙',
-  'black-king': '♚', 'black-queen': '♛', 'black-rook': '♜', 'black-bishop': '♝', 'black-knight': '♞', 'black-pawn': '♟',
-};
+import { labelFor } from './pieces';
 
 function statusText(state: GameState): string {
   const status = getStatus(state);
@@ -31,14 +26,10 @@ export function mountBoard(container: HTMLElement, statusEl: HTMLElement, initia
         if (highlights.some(m => m.to[0] === r && m.to[1] === c)) square.classList.add('target');
         const piece = state.board[r][c];
         if (piece) {
-          const symbol = GLYPHS[`${piece.side}-${piece.type}`];
-          if (symbol) {
-            square.textContent = symbol;
-          } else {
-            // custom pieces get a short text label until they have real artwork
-            square.textContent = CATALOGUE[piece.type]?.icon ?? '?';
-            square.classList.add('custom', piece.side);
-          }
+          const label = labelFor(piece.type, piece.side);
+          square.textContent = label.text;
+          // custom pieces get a short text label until they have real artwork
+          if (label.custom) square.classList.add('custom', piece.side);
         }
         square.addEventListener('click', () => onClick(r, c));
         container.appendChild(square);
